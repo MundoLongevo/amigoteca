@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Álbum de Figurinhas: Amigos de Minha Vida!</title>
+    <style>
+        /* ===== RESET E BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body {
+            background: #f0ebe3;
+            padding: 20px 16px 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #app {
+            max-width: 1000px;
+            width: 100%;
+            flex: 1;
+            position: relative;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3e40;
+            flex-wrap: wrap;
+        }
+        .header-title .main-title {
+            color: #2d3e40;
+        }
+        .header-title .main-title span {
+            color: #b68a6b;
+        }
+        .header-title .owner-name {
+            font-size: 16px;
+            font-weight: 400;
+            color: #7a6a5a;
+            margin-left: 4px;
+        }
+        .header-title .edit-name-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #8a7a6a;
+            padding: 0 4px;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .btn-add {
+            background: #2d3e40;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 10px 18px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+        /* Estatísticas de fases */
+        .phase-stats {
+            display: flex;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            background: #e8e0d8;
+            padding: 4px 14px;
+            border-radius: 40px;
+            color: #2d3e40;
+            flex-wrap: wrap;
+        }
+        .phase-stats span { display: flex; align-items: center; gap: 2px; }
+        .stat-infancia { color: #4A90E2; }
+        .stat-juventude { color: #2ECC71; }
+        .stat-adulto { color: #F39C12; }
+        .stat-longevidade { color: #E74C3C; }
+
+        /* ===== LEMBRETE DE ANIVERSÁRIO ===== */
+        .birthday-reminder {
+            background: linear-gradient(135deg, #fff9f0, #ffecd6);
+            border-radius: 20px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            border-left: 6px solid #e67e22;
+            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.15);
+            display: none;
+        }
+        .birthday-reminder.visible { display: block; }
+        .birthday-reminder h3 {
+            font-size: 16px;
+            color: #d35400;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .birthday-reminder h3 span { font-size: 22px; }
+        .birthday-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+        }
+        .birthday-item {
+            background: white;
+            padding: 4px 14px 4px 10px;
+            border-radius: 40px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        .birthday-item .bday-name { font-weight: 600; color: #2d3e40; }
+        .birthday-item .bday-date { color: #7f6b5a; font-size: 12px; }
+        .birthday-item .bday-days {
+            background: #e67e22;
+            color: white;
+            border-radius: 30px;
+            padding: 0 10px;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 20px;
+        }
+        .birthday-item .bday-days.today { background: #e74c3c; animation: pulse 1.5s infinite; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* ===== PIN OVERLAY ===== */
+        #pinOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(30, 30, 30, 0.92);
+            backdrop-filter: blur(6px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            padding: 20px;
+        }
+        #pinOverlay.active { display: flex; }
+        #pinOverlay h2 { font-size: 28px; margin-bottom: 6px; }
+        #pinOverlay p { color: #ccc; margin-bottom: 20px; }
+        #pinOverlay input {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 16px;
+            padding: 14px 24px;
+            font-size: 28px;
+            letter-spacing: 12px;
+            text-align: center;
+            color: white;
+            width: 200px;
+            max-width: 80%;
+            outline: none;
+        }
+        #pinOverlay input:focus { border-color: #d4af37; }
+        #pinOverlay .pin-btn {
+            background: #d4af37;
+            border: none;
+            color: #1e1e1e;
+            padding: 14px 40px;
+            border-radius: 40px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 16px;
+            cursor: pointer;
+            width: 200px;
+            max-width: 80%;
+        }
+        #pinError { color: #ff7a7a; margin-top: 12px; font-size: 14px; min-height: 20px; }
+
+        /* ===== FORM ===== */
+        #formContainer {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            display: none;
+        }
+        #formContainer.open { display: block; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #3d3d3d;
+            margin-bottom: 4px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #ddd;
+            border-radius: 12px;
+            font-size: 14px;
+            background: #fafafa;
+            transition: 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #b68a6b;
+            outline: none;
+            background: white;
+        }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-save {
+            width: 100%;
+            background: #b68a6b;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 6px;
+        }
+        .btn-save:hover { background: #9e765a; }
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+            width: 100%;
+            border: none;
+            padding: 10px;
+            border-radius: 40px;
+            font-size: 14px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        #otherOriginGroup { display: none; }
+
+        /* ===== GRADE DE FIGURINHAS (3D FLIP) ===== */
+        .sticker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        /* Card 3D */
+        .sticker-card {
+            background: transparent;
+            perspective: 800px;
+            height: 290px;
+            cursor: pointer;
+        }
+        .sticker-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            border-radius: 20px;
+        }
+        .sticker-card.flipped .sticker-inner {
+            transform: rotateY(180deg);
+        }
+
+        .sticker-front, .sticker-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            padding: 14px 10px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-y: auto;
+            border: 2px solid #e8e0d8;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        .sticker-back {
+            transform: rotateY(180deg);
+            background: #fcf8f3;
+            border-color: #d4c8bc;
+            justify-content: center;
+            text-align: center;
+            font-size: 13px;
+            color: #3d3d3d;
+            padding: 16px;
+        }
+        .sticker-back h4 { color: #2d3e40; margin-bottom: 4px; font-size: 14px; }
+        .sticker-back .back-label { font-weight: 600; color: #b68a6b; margin-top: 8px; }
+        .sticker-back p { font-size: 12px; line-height: 1.4; margin: 2px 0; }
+
+        /* ===== RARIDADES E EFEITOS ===== */
+        .sticker-card.rarity-Lendária .sticker-front {
+            border: 3px solid #9b59b6;
+            background: radial-gradient(circle at 30% 20%, #f4ecf7, #d7bde2);
+            box-shadow: 0 0 20px rgba(155, 89, 182, 0.4);
+        }
+        .sticker-card.rarity-Lendária .sticker-photo { border-color: #9b59b6; }
+        .sticker-card.rarity-Lendária .rarity-badge { background: #9b59b6; color: white; }
+
+        .sticker-card.rarity-Épica .sticker-front {
+            border: 3px solid #3498db;
+            background: linear-gradient(145deg, #ebf5fb, #d6eaf8);
+        }
+        .sticker-card.rarity-Épica .rarity-badge { background: #3498db; color: white; }
+
+        .sticker-card.rarity-Rara .sticker-front {
+            border: 3px solid #1abc9c;
+            background: #e8f8f5;
+        }
+        .sticker-card.rarity-Rara .rarity-badge { background: #1abc9c; color: white; }
+
+        .sticker-card.rarity-Especial .sticker-front {
+            border: 2px solid #bdc3c7;
+            background: #fdfdfd;
+        }
+        .sticker-card.rarity-Especial .rarity-badge { background: #bdc3c7; color: #333; }
+
+        /* Badge de Raridade e Número */
+        .rarity-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 30px;
+            letter-spacing: 0.5px;
+            z-index: 2;
+        }
+        .sticker-number {
+            position: absolute;
+            bottom: 8px;
+            right: 10px;
+            font-size: 11px;
+            color: #aaa;
+            font-weight: 600;
+            background: rgba(255,255,255,0.6);
+            padding: 0 6px;
+            border-radius: 20px;
+            z-index: 2;
+        }
+        /* Badge de Fase da Vida */
+        .phase-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 30px;
+            letter-spacing: 0.3px;
+            z-index: 2;
+            color: white;
+            background: #888;
+        }
+        .phase-infancia { background: #4A90E2; }
+        .phase-juventude { background: #2ECC71; }
+        .phase-adulto { background: #F39C12; }
+        .phase-longevidade { background: #E74C3C; }
+
+        .sticker-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #e9e1d9;
+            margin: 0 auto 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #8a7a6a;
+            overflow: hidden;
+            border: 3px solid #b68a6b;
+            flex-shrink: 0;
+        }
+        .sticker-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .sticker-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: #1e2a2b;
+            line-height: 1.2;
+            text-align: center;
+        }
+        .sticker-nick { font-size: 12px; color: #888; }
+        .sticker-origin {
+            font-size: 11px;
+            background: rgba(0,0,0,0.05);
+            padding: 2px 12px;
+            border-radius: 30px;
+            display: inline-block;
+            margin: 4px 0 2px;
+            color: #5a4e44;
+        }
+        .sticker-tree {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2d5e40;
+            background: #e2f0e6;
+            padding: 2px 10px;
+            border-radius: 30px;
+            display: inline-block;
+            margin: 3px 0;
+        }
+        .sticker-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+            width: 100%;
+            justify-content: center;
+            position: relative;
+            z-index: 3;
+        }
+        .sticker-actions button {
+            border: none;
+            background: rgba(255,255,255,0.8);
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 600;
+            backdrop-filter: blur(2px);
+        }
+        .btn-edit { color: #2d3e40; }
+        .btn-del { color: #b34a4a; }
+        .empty-state {
+            text-align: center;
+            color: #9a8a7a;
+            padding: 40px 20px;
+            font-size: 16px;
+            grid-column: 1 / -1;
+        }
+        .empty-state span { font-size: 48px; display: block; margin-bottom: 12px; }
+
+        /* TOOLBAR */
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin: 16px 0 6px;
+            flex-wrap: wrap;
+        }
+        .toolbar input, .toolbar select {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 40px;
+            border: 1.5px solid #ddd;
+            font-size: 14px;
+            background: white;
+            min-width: 100px;
+        }
+        .toolbar select { flex: 0.5; min-width: 100px; }
+        .toolbar button {
+            background: #e8e0d8;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .badge-count {
+            background: #b68a6b;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 40px;
+            font-size: 13px;
+            margin-left: 6px;
+        }
+
+        /* FOOTER */
+        .app-footer {
+            margin-top: 40px;
+            padding: 16px 0 8px;
+            text-align: center;
+            border-top: 2px solid #e0d6cc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .app-footer .credits {
+            font-size: 14px;
+            color: #4d3e32;
+            font-weight: 400;
+            text-align: left;
+            line-height: 1.5;
+        }
+        .app-footer .credits strong { color: #2d3e40; }
+        .app-footer .credits .contact {
+            font-size: 13px;
+            color: #7a6a5a;
+        }
+        .app-footer .footer-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .app-footer .footer-actions button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 30px;
+            background: #f0ebe3;
+            transition: 0.2s;
+        }
+        .app-footer .footer-actions button:hover { background: #ddd4ca; }
+        .btn-reset {
+            color: #b34a4a;
+            font-weight: 600;
+            font-size: 13px !important;
+        }
+
+        /* PIN SETUP MODAL */
+        .pin-setup-modal {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            max-width: 360px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .pin-setup-modal h3 { margin-bottom: 12px; color: #2d3e40; }
+        .pin-setup-modal input {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid #ddd;
+            border-radius: 12px;
+            font-size: 20px;
+            letter-spacing: 8px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .pin-setup-modal .modal-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .pin-setup-modal .modal-actions button {
+            padding: 10px 20px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .modal-bg {
+            display: none;
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-bg.active { display: flex; }
+
+        /* Responsividade */
+        @media (max-width: 500px) {
+            .sticker-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .sticker-card { height: 270px; }
+            .header-title { font-size: 17px; }
+            .phase-stats { font-size: 11px; padding: 4px 10px; }
+            .birthday-item { font-size: 12px; padding: 2px 10px; }
+            .app-footer .credits { font-size: 12px; }
+        }
+        @media (min-width: 700px) {
+            .sticker-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (min-width: 1000px) {
+            .sticker-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+
+    <!-- PIN -->
+    <div id="pinOverlay">
+        <h2>🔒 Álbum Lendário</h2>
+        <p>Digite o PIN para acessar suas figurinhas</p>
+        <input type="password" id="pinInput" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+        <button class="pin-btn" onclick="checkPin()">✨ Desbloquear</button>
+        <div id="pinError"></div>
+        <div style="margin-top:30px; font-size:12px; color:#666;">Figurinhas especiais da sua vida</div>
+    </div>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-title">
+            <span class="main-title">📖 Álbum de Figurinhas: <span>Amigos de Minha Vida!</span></span>
+            <span class="owner-name" id="ownerNameDisplay">— <span id="ownerNameText">...</span></span>
+            <button class="edit-name-btn" onclick="editOwnerName()" title="Editar nome">✏️</button>
+        </div>
+        <div class="header-actions">
+            <div class="phase-stats" id="phaseStats">
+                <span class="stat-infancia">👶 <span id="countInfancia">0</span></span>
+                <span class="stat-juventude">🧑 <span id="countJuventude">0</span></span>
+                <span class="stat-adulto">👨 <span id="countAdulto">0</span></span>
+                <span class="stat-longevidade">👴 <span id="countLongevidade">0</span></span>
+            </div>
+            <button class="btn-add" onclick="toggleForm()">+ Nova Figurinha</button>
+        </div>
+    </div>
+
+    <!-- LEMBRETE DE ANIVERSÁRIO -->
+    <div id="birthdayReminder" class="birthday-reminder">
+        <h3><span>🎂</span> Aniversariantes próximos</h3>
+        <div id="birthdayList" class="birthday-list"></div>
+    </div>
+
+    <!-- FORM -->
+    <div id="formContainer">
+        <h3 style="margin-bottom:12px; color:#2d3e40;">📸 Criar nova figurinha</h3>
+        <div class="form-group">
+            <label>Nome completo *</label>
+            <input type="text" id="fName" placeholder="Ex: Ana Maria Silva">
+        </div>
+        <div class="form-group">
+            <label>Apelido</label>
+            <input type="text" id="fNick" placeholder="Como você a chama?">
+        </div>
+        <div class="form-group">
+            <label>Aniversário (Dia/Mês)</label>
+            <input type="text" id="fBday" placeholder="Ex: 15/03">
+        </div>
+        <div class="form-group">
+            <label>Fase da Vida (Ciclo da Amizade)</label>
+            <select id="fLifePhase">
+                <option value="Infância (até 15)">👶 Infância (até 15 anos)</option>
+                <option value="Juventude (15-25)">🧑 Juventude (15 aos 25)</option>
+                <option value="Adulto (25-50)">👨 Adulto (25 aos 50)</option>
+                <option value="Longevidade (50+)">👴 Longevidade (50+)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Área de origem *</label>
+            <select id="fOrigin" onchange="toggleOtherOrigin()">
+                <option value="Esportes">⚽ Esportes</option>
+                <option value="Igreja">⛪ Igreja</option>
+                <option value="Trabalho">💼 Trabalho</option>
+                <option value="Família">👨‍👩‍👧‍👦 Família</option>
+                <option value="Clube">🏌️ Clube</option>
+                <option value="Escola">📚 Escola</option>
+                <option value="Lazer">🎮 Lazer</option>
+                <option value="Vizinhos">🏘️ Vizinhos</option>
+                <option value="Passeios">🚶 Passeios</option>
+                <option value="Eventos Culturais/Festas">🎭 Eventos Culturais/Festas</option>
+                <option value="Academia">🏋️ Academia</option>
+                <option value="Outro">✏️ Outro (escrever)</option>
+            </select>
+        </div>
+        <div class="form-group" id="otherOriginGroup">
+            <label>Qual outro?</label>
+            <input type="text" id="fOtherOrigin" placeholder="Ex: Viagem, Vizinhança...">
+        </div>
+        <div class="form-group">
+            <label>Parte da Árvore da Vida</label>
+            <select id="fTree">
+                <option value="Raízes">🌱 Raízes</option><option value="Tronco">🌳 Tronco</option>
+                <option value="Galhos">🌿 Galhos</option><option value="Flores">🌸 Flores</option>
+                <option value="Frutos">🍎 Frutos</option><option value="Folhas">🍃 Folhas</option>
+                <option value="Sementes">🌰 Sementes</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>⭐ Raridade da Figurinha</label>
+            <select id="fRarity">
+                <option value="Especial">⭐ Especial</option>
+                <option value="Rara">🌟 Rara</option>
+                <option value="Épica">✨ Épica</option>
+                <option value="Lendária">🔥 Lendária (in memoriam)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>3 valores (separados por vírgula)</label>
+            <input type="text" id="fValues" placeholder="Ex: Lealdade, Generosidade, Humor">
+        </div>
+        <div class="form-group">
+            <label>Razões da amizade (verso da figurinha)</label>
+            <textarea id="fReasons" placeholder="O que torna essa amizade única..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>Gratidão (verso da figurinha)</label>
+            <textarea id="fGratitude" placeholder="Gratidão por..."></textarea>
+        </div>
+        <div class="form-row-2">
+            <div class="form-group"><label>E-mail</label><input type="email" id="fEmail" placeholder="amigo@email.com"></div>
+            <div class="form-group"><label>Telefone</label><input type="text" id="fPhone" placeholder="(11) 99999-9999"></div>
+        </div>
+        <div class="form-group">
+            <label>📷 Foto</label>
+            <input type="file" id="fPhoto" accept="image/*" style="padding:6px;">
+        </div>
+        <input type="hidden" id="editId" value="">
+        <button class="btn-save" onclick="saveFriend()">💾 Salvar Figurinha</button>
+        <button class="btn-cancel" onclick="toggleForm()">Cancelar</button>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+        <input type="text" id="searchInput" placeholder="🔍 Buscar por nome..." oninput="renderStickers()">
+        <select id="rarityFilter" onchange="renderStickers()">
+            <option value="Todas">📋 Raridade</option>
+            <option value="Especial">⭐ Especial</option>
+            <option value="Rara">🌟 Rara</option>
+            <option value="Épica">✨ Épica</option>
+            <option value="Lendária">🔥 Lendária (in memoriam)</option>
+        </select>
+        <select id="phaseFilter" onchange="renderStickers()">
+            <option value="Todas">🔄 Fase da Vida</option>
+            <option value="Infância (até 15)">👶 Infância</option>
+            <option value="Juventude (15-25)">🧑 Juventude</option>
+            <option value="Adulto (25-50)">👨 Adulto</option>
+            <option value="Longevidade (50+)">👴 Longevidade</option>
+        </select>
+        <button onclick="exportData()">📤</button>
+        <button onclick="importData()">📥</button>
+    </div>
+    <div style="margin-bottom:8px; font-size:14px; color:#5a4e44;">
+        Total: <span id="friendCount" class="badge-count">0</span>
+        <span style="margin-left:12px;">✨ Raras/Lendárias: <span id="rareCount">0</span></span>
+    </div>
+
+    <!-- GRADE -->
+    <div id="stickerGrid" class="sticker-grid">
+        <div class="empty-state"><span>🖼️</span> Seu álbum está vazio.<br>Clique em <strong>"+ Nova Figurinha"</strong> e comece a guardar seus amigos especiais!</div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="app-footer">
+        <div class="credits">
+            <strong>❤️ "Amigo é Coisa Pra Se Guardar"</strong><br>
+            Criado com ❤️ por <strong>Ricardo de Faria Barros</strong> – Psicólogo e Especializando em Saúde do Idoso<br>
+            <span class="contact">📧 Contato: ricardo@animodh.com.br</span>
+        </div>
+        <div class="footer-actions">
+            <button onclick="resetAlbum()" class="btn-reset" title="Limpar todos os dados e recomeçar">🧹 Resetar</button>
+            <button onclick="togglePinSetup()" title="Configurar PIN">🔐</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PIN SETUP -->
+<div class="modal-bg" id="pinSetupModal">
+    <div class="pin-setup-modal">
+        <h3>🔐 Configurar PIN</h3>
+        <p style="font-size:13px; color:#666; margin-bottom:12px;">PIN numérico (4 a 6 dígitos) para proteger seu álbum.</p>
+        <input type="password" id="newPinInput" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="Novo PIN">
+        <input type="password" id="confirmPinInput" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="Confirmar PIN">
+        <div style="margin: 8px 0 12px; font-size:13px; color:#b34a4a;" id="pinSetupMsg"></div>
+        <div class="modal-actions">
+            <button onclick="closePinSetup()" style="background:#e0e0e0;">Cancelar</button>
+            <button onclick="savePin()" style="background:#2d3e40; color:white;">Salvar</button>
+            <button onclick="removePin()" style="background:#b34a4a; color:white;">Remover</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===== GLOBAIS =====
+    let friends = [];
+    let editingId = null;
+    let pinHash = localStorage.getItem('stickerPinHash') || null;
+    let isUnlocked = false;
+
+    // ===== NOME DO DONO =====
+    function loadOwnerName() {
+        let name = localStorage.getItem('ownerName');
+        if (!name) {
+            name = prompt('Qual o seu nome? (Dono do álbum)') || 'Um Amigo';
+            localStorage.setItem('ownerName', name);
+        }
+        document.getElementById('ownerNameText').textContent = name;
+    }
+    function editOwnerName() {
+        const current = localStorage.getItem('ownerName') || 'Um Amigo';
+        const newName = prompt('Editar nome do dono:', current);
+        if (newName && newName.trim()) {
+            localStorage.setItem('ownerName', newName.trim());
+            document.getElementById('ownerNameText').textContent = newName.trim();
+        }
+    }
+
+    // ===== PIN =====
+    function togglePinSetup() {
+        document.getElementById('pinSetupModal').classList.toggle('active');
+        document.getElementById('newPinInput').value = '';
+        document.getElementById('confirmPinInput').value = '';
+        document.getElementById('pinSetupMsg').textContent = pinHash ? '⚠️ Digite o NOVO PIN para substituir o antigo.' : '';
+    }
+    function closePinSetup() { document.getElementById('pinSetupModal').classList.remove('active'); }
+    function savePin() {
+        const p1 = document.getElementById('newPinInput').value.trim();
+        const p2 = document.getElementById('confirmPinInput').value.trim();
+        if (p1.length < 4) { document.getElementById('pinSetupMsg').textContent = '❌ Mínimo 4 dígitos.'; return; }
+        if (p1 !== p2) { document.getElementById('pinSetupMsg').textContent = '❌ PINs não coincidem.'; return; }
+        localStorage.setItem('stickerPinHash', btoa(p1));
+        pinHash = btoa(p1);
+        document.getElementById('pinSetupMsg').textContent = '✅ PIN salvo! Recarregue.';
+        setTimeout(closePinSetup, 1200);
+    }
+    function removePin() {
+        if (!pinHash) { document.getElementById('pinSetupMsg').textContent = '⚠️ Não há PIN.'; return; }
+        if (confirm('Remover PIN?')) { localStorage.removeItem('stickerPinHash'); pinHash = null; document.getElementById('pinSetupMsg').textContent = '🗑️ Removido!'; setTimeout(closePinSetup, 1200); }
+    }
+    function checkPin() {
+        const input = document.getElementById('pinInput');
+        const error = document.getElementById('pinError');
+        if (!pinHash) { isUnlocked = true; document.getElementById('pinOverlay').classList.remove('active'); renderStickers(); updateBirthdayReminder(); return; }
+        if (btoa(input.value.trim()) === pinHash) {
+            isUnlocked = true;
+            document.getElementById('pinOverlay').classList.remove('active');
+            error.textContent = '';
+            input.value = '';
+            renderStickers();
+            updateBirthdayReminder();
+        } else {
+            error.textContent = '❌ PIN incorreto.';
+            input.value = '';
+            input.focus();
+        }
+    }
+    document.getElementById('pinInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkPin(); });
+
+    // ===== FLIP =====
+    function flipCard(el) {
+        if (!isUnlocked) return;
+        el.classList.toggle('flipped');
+    }
+
+    // ===== LEMBRETE DE ANIVERSÁRIO =====
+    function updateBirthdayReminder() {
+        const container = document.getElementById('birthdayReminder');
+        const list = document.getElementById('birthdayList');
+        if (!isUnlocked) { container.classList.remove('visible'); return; }
+
+        const today = new Date();
+        const currentYear = today.getFullYear();
+
+        function parseBday(str) {
+            if (!str) return null;
+            const parts = str.split('/');
+            if (parts.length !== 2) return null;
+            const day = parseInt(parts[0]);
+            const month = parseInt(parts[1]);
+            if (isNaN(day) || isNaN(month) || month < 1 || month > 12 || day < 1 || day > 31) return null;
+            return { day, month };
+        }
+
+        const upcoming = [];
+        friends.forEach(f => {
+            if (!f.bday) return;
+            const parsed = parseBday(f.bday);
+            if (!parsed) return;
+            let { day, month } = parsed;
+            let bDate = new Date(currentYear, month - 1, day);
+            if (bDate < today) {
+                bDate = new Date(currentYear + 1, month - 1, day);
+            }
+            const diffTime = bDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays <= 7 && diffDays >= 0) {
+                upcoming.push({
+                    friend: f,
+                    date: bDate,
+                    days: diffDays,
+                    displayDate: `${String(day).padStart(2,'0')}/${String(month).padStart(2,'0')}`
+                });
+            }
+        });
+
+        upcoming.sort((a, b) => a.days - b.days);
+
+        if (upcoming.length === 0) {
+            container.classList.remove('visible');
+            return;
+        }
+
+        container.classList.add('visible');
+        list.innerHTML = upcoming.map(item => {
+            const daysText = item.days === 0 ? 'Hoje! 🎉' : `${item.days} dias`;
+            const daysClass = item.days === 0 ? 'today' : '';
+            return `
+                <div class="birthday-item">
+                    <span class="bday-name">${item.friend.name}${item.friend.nick ? ` (${item.friend.nick})` : ''}</span>
+                    <span class="bday-date">${item.displayDate}</span>
+                    <span class="bday-days ${daysClass}">${daysText}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ===== RESET ÁLBUM =====
+    function resetAlbum() {
+        if (friends.length === 0) {
+            alert('O álbum já está vazio!');
+            return;
+        }
+        if (confirm('⚠️ Tem certeza que deseja APAGAR TODAS as figurinhas?\nEsta ação não pode ser desfeita.')) {
+            localStorage.removeItem('stickerAlbum');
+            friends = [];
+            saveData();
+            renderStickers();
+            updateBirthdayReminder();
+            alert('🧹 Álbum resetado com sucesso!');
+        }
+    }
+
+    // ===== CRUD =====
+    function loadData() {
+        loadOwnerName();
+        if (pinHash) { document.getElementById('pinOverlay').classList.add('active'); document.getElementById('pinInput').focus(); isUnlocked = false; } 
+        else { isUnlocked = true; }
+        const stored = localStorage.getItem('stickerAlbum');
+        if (stored) { try { friends = JSON.parse(stored); } catch(e){ friends = []; } } 
+        else {
+            friends = []; // sempre começa vazio
+            saveData();
+        }
+        updateStats();
+        if (isUnlocked) { renderStickers(); updateBirthdayReminder(); }
+    }
+
+    function saveData() {
+        localStorage.setItem('stickerAlbum', JSON.stringify(friends));
+        updateStats();
+        if (isUnlocked) updateBirthdayReminder();
+    }
+
+    function updateStats() {
+        document.getElementById('friendCount').textContent = friends.length;
+        const countInf = friends.filter(f => f.lifePhase === 'Infância (até 15)').length;
+        const countJuv = friends.filter(f => f.lifePhase === 'Juventude (15-25)').length;
+        const countAdul = friends.filter(f => f.lifePhase === 'Adulto (25-50)').length;
+        const countLong = friends.filter(f => f.lifePhase === 'Longevidade (50+)').length;
+        document.getElementById('countInfancia').textContent = countInf;
+        document.getElementById('countJuventude').textContent = countJuv;
+        document.getElementById('countAdulto').textContent = countAdul;
+        document.getElementById('countLongevidade').textContent = countLong;
+        const rareCount = friends.filter(f => f.rarity === 'Rara' || f.rarity === 'Épica' || f.rarity === 'Lendária').length;
+        document.getElementById('rareCount').textContent = rareCount;
+    }
+
+    function renderStickers() {
+        if (!isUnlocked) return;
+        const grid = document.getElementById('stickerGrid');
+        const search = document.getElementById('searchInput').value.toLowerCase().trim();
+        const rarityFilter = document.getElementById('rarityFilter').value;
+        const phaseFilter = document.getElementById('phaseFilter').value;
+
+        let filtered = friends;
+        if (search) filtered = filtered.filter(f => f.name.toLowerCase().includes(search) || (f.nick && f.nick.toLowerCase().includes(search)));
+        if (rarityFilter !== 'Todas') filtered = filtered.filter(f => f.rarity === rarityFilter);
+        if (phaseFilter !== 'Todas') filtered = filtered.filter(f => f.lifePhase === phaseFilter);
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div class="empty-state"><span>🕵️</span> Nenhuma figurinha encontrada.<br>Que tal adicionar um amigo dessa fase?</div>`;
+            return;
+        }
+
+        let html = '';
+        filtered.forEach((f, idx) => {
+            const originDisplay = f.origin === 'Outro' ? f.otherOrigin : f.origin;
+            const photoHtml = f.photo ? `<img src="${f.photo}" alt="foto">` : '📷';
+            const valuesArr = f.values ? f.values.split(',').map(v => v.trim()).slice(0,3).join(' · ') : '';
+            const rarityClass = `rarity-${f.rarity || 'Especial'}`;
+            const rarityEmojis = { 'Especial':'⭐', 'Rara':'🌟', 'Épica':'✨', 'Lendária':'🔥' };
+            let rarityDisplay = f.rarity || 'Especial';
+            if (rarityDisplay === 'Lendária') rarityDisplay = 'Lendária (in memoriam)';
+            
+            let phaseIcon = '👶', phaseClass = 'phase-infancia';
+            if (f.lifePhase === 'Juventude (15-25)') { phaseIcon = '🧑'; phaseClass = 'phase-juventude'; }
+            else if (f.lifePhase === 'Adulto (25-50)') { phaseIcon = '👨'; phaseClass = 'phase-adulto'; }
+            else if (f.lifePhase === 'Longevidade (50+)') { phaseIcon = '👴'; phaseClass = 'phase-longevidade'; }
+            
+            const number = friends.indexOf(f) + 1;
+
+            html += `
+                <div class="sticker-card ${rarityClass}" onclick="flipCard(this)">
+                    <div class="sticker-inner">
+                        <!-- FRENTE -->
+                        <div class="sticker-front">
+                            <span class="rarity-badge">${rarityEmojis[f.rarity] || '⭐'} ${rarityDisplay}</span>
+                            <span class="phase-badge ${phaseClass}">${phaseIcon} ${f.lifePhase || 'Fase'}</span>
+                            <span class="sticker-number">#${String(number).padStart(3, '0')}</span>
+                            <div class="sticker-photo">${photoHtml}</div>
+                            <div class="sticker-name">${f.name}</div>
+                            ${f.nick ? `<div class="sticker-nick">"${f.nick}"</div>` : ''}
+                            <div class="sticker-origin">${originDisplay || '🌍'}</div>
+                            <div class="sticker-tree">${f.tree || '🌳'}</div>
+                            ${valuesArr ? `<div style="font-size:10px; color:#6a5a4a; margin:2px 0;">${valuesArr}</div>` : ''}
+                            ${f.bday ? `<div style="font-size:11px; color:#999; margin:2px 0;">🎂 ${f.bday}</div>` : ''}
+                            <div class="sticker-actions" onclick="event.stopPropagation();">
+                                <button class="btn-edit" onclick="editFriend('${f.id}')">✏️</button>
+                                <button class="btn-del" onclick="deleteFriend('${f.id}')">🗑️</button>
+                            </div>
+                        </div>
+                        <!-- VERSO -->
+                        <div class="sticker-back">
+                            <h4>💬 Razões</h4>
+                            <p>${f.reasons || '...'}</p>
+                            <div class="back-label">🙏 Gratidão</div>
+                            <p>${f.gratitude || '...'}</p>
+                            <div style="margin-top:8px; font-size:10px; color:#aaa;">Clique para virar</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        grid.innerHTML = html;
+    }
+
+    // ===== FORM =====
+    function toggleForm() {
+        if (!isUnlocked) return;
+        const c = document.getElementById('formContainer');
+        c.classList.toggle('open');
+        if (!c.classList.contains('open')) clearForm();
+        else { document.getElementById('editId').value = ''; editingId = null; }
+    }
+    function clearForm() {
+        ['fName','fNick','fBday','fOtherOrigin','fValues','fReasons','fGratitude','fEmail','fPhone','fPhoto'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('fOrigin').value = 'Esportes';
+        document.getElementById('fTree').value = 'Raízes';
+        document.getElementById('fRarity').value = 'Especial';
+        document.getElementById('fLifePhase').value = 'Infância (até 15)';
+        document.getElementById('editId').value = '';
+        editingId = null;
+        document.getElementById('otherOriginGroup').style.display = 'none';
+    }
+    function toggleOtherOrigin() {
+        document.getElementById('otherOriginGroup').style.display = (document.getElementById('fOrigin').value === 'Outro') ? 'block' : 'none';
+    }
+
+    function saveFriend() {
+        if (!isUnlocked) return;
+        const name = document.getElementById('fName').value.trim();
+        if (!name) { alert('O nome é obrigatório!'); return; }
+
+        const photoFile = document.getElementById('fPhoto').files[0];
+        const reader = new FileReader();
+        const save = (photoBase64 = '') => {
+            const obj = {
+                id: editingId || Date.now().toString(36) + Math.random().toString(36).substring(2),
+                name,
+                nick: document.getElementById('fNick').value.trim(),
+                bday: document.getElementById('fBday').value.trim(),
+                origin: document.getElementById('fOrigin').value,
+                otherOrigin: (document.getElementById('fOrigin').value === 'Outro') ? document.getElementById('fOtherOrigin').value.trim() : '',
+                tree: document.getElementById('fTree').value,
+                rarity: document.getElementById('fRarity').value,
+                lifePhase: document.getElementById('fLifePhase').value,
+                values: document.getElementById('fValues').value.trim(),
+                reasons: document.getElementById('fReasons').value.trim(),
+                gratitude: document.getElementById('fGratitude').value.trim(),
+                email: document.getElementById('fEmail').value.trim(),
+                phone: document.getElementById('fPhone').value.trim(),
+                photo: photoBase64
+            };
+            if (editingId) {
+                const idx = friends.findIndex(f => f.id === editingId);
+                if (idx !== -1) friends[idx] = { ...friends[idx], ...obj };
+            } else {
+                friends.push(obj);
+            }
+            saveData();
+            renderStickers();
+            toggleForm();
+            clearForm();
+        };
+
+        if (photoFile) {
+            reader.onload = (e) => save(e.target.result);
+            reader.readAsDataURL(photoFile);
+        } else {
+            if (editingId) {
+                const existing = friends.find(f => f.id === editingId);
+                if (existing && existing.photo) { save(existing.photo); return; }
+            }
+            save('');
+        }
+    }
+
+    function editFriend(id) {
+        if (!isUnlocked) return;
+        const f = friends.find(fr => fr.id === id);
+        if (!f) return;
+        editingId = id;
+        document.getElementById('editId').value = id;
+        document.getElementById('fName').value = f.name || '';
+        document.getElementById('fNick').value = f.nick || '';
+        document.getElementById('fBday').value = f.bday || '';
+        document.getElementById('fOrigin').value = f.origin || 'Esportes';
+        document.getElementById('fOtherOrigin').value = f.otherOrigin || '';
+        document.getElementById('fTree').value = f.tree || 'Raízes';
+        document.getElementById('fRarity').value = f.rarity || 'Especial';
+        document.getElementById('fLifePhase').value = f.lifePhase || 'Infância (até 15)';
+        document.getElementById('fValues').value = f.values || '';
+        document.getElementById('fReasons').value = f.reasons || '';
+        document.getElementById('fGratitude').value = f.gratitude || '';
+        document.getElementById('fEmail').value = f.email || '';
+        document.getElementById('fPhone').value = f.phone || '';
+        document.getElementById('fPhoto').value = '';
+        toggleOtherOrigin();
+        document.getElementById('formContainer').classList.add('open');
+        document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function deleteFriend(id) {
+        if (!isUnlocked) return;
+        if (confirm('Remover esta figurinha?')) {
+            friends = friends.filter(f => f.id !== id);
+            saveData();
+            renderStickers();
+        }
+    }
+
+    // ===== EXPORT / IMPORT =====
+    function exportData() {
+        if (!isUnlocked) return;
+        const blob = new Blob([JSON.stringify(friends, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `album_amigos_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+    function importData() {
+        if (!isUnlocked) return;
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const imported = JSON.parse(ev.target.result);
+                    if (Array.isArray(imported) && imported.length > 0) {
+                        if (confirm(`Substituir ${friends.length} por ${imported.length} figurinhas?`)) {
+                            friends = imported;
+                            saveData();
+                            renderStickers();
+                            alert('Álbum importado com sucesso!');
+                        }
+                    } else alert('Arquivo inválido.');
+                } catch(err) { alert('Erro ao ler o arquivo.'); }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
+
+    // ===== START =====
+    loadData();
+</script>
+</body>
+</html>
