@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Álbum de Figurinhas: Amigos de Minha Vida!</title>
+    <title>AMIGOTECA - Álbum de Amigos</title>
     <style>
         /* ===== RESET E BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -40,8 +40,19 @@
             color: #2d3e40;
             flex-wrap: wrap;
         }
+        .header-title .amigoteca {
+            font-size: 28px;
+            color: #b68a6b;
+            letter-spacing: 1px;
+            background: #2d3e40;
+            color: #f0ebe3;
+            padding: 2px 14px;
+            border-radius: 40px;
+            display: inline-block;
+        }
         .header-title .main-title {
             color: #2d3e40;
+            font-size: 18px;
         }
         .header-title .main-title span {
             color: #b68a6b;
@@ -481,7 +492,9 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 13px;
+            transition: 0.2s;
         }
+        .toolbar button:hover { background: #d5cdc4; }
         .badge-count {
             background: #b68a6b;
             color: white;
@@ -537,50 +550,170 @@
             font-size: 13px !important;
         }
 
-        /* PIN SETUP MODAL */
-        .pin-setup-modal {
-            background: white;
-            border-radius: 24px;
-            padding: 24px;
-            max-width: 360px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .pin-setup-modal h3 { margin-bottom: 12px; color: #2d3e40; }
-        .pin-setup-modal input {
-            width: 100%;
-            padding: 12px;
-            border: 1.5px solid #ddd;
-            border-radius: 12px;
-            font-size: 20px;
-            letter-spacing: 8px;
-            text-align: center;
-            margin-bottom: 12px;
-        }
-        .pin-setup-modal .modal-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-        }
-        .pin-setup-modal .modal-actions button {
-            padding: 10px 20px;
-            border-radius: 40px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .modal-bg {
+        /* ===== MODAL DE AJUDA ===== */
+        .help-modal {
             display: none;
             position: fixed;
-            top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 10000;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 10001;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
-        .modal-bg.active { display: flex; }
+        .help-modal.active { display: flex; }
+        .help-content {
+            background: white;
+            border-radius: 24px;
+            padding: 28px 24px;
+            max-width: 560px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .help-content h2 {
+            color: #2d3e40;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .help-content h2 span { font-size: 28px; }
+        .help-content .sub {
+            color: #7a6a5a;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        .help-step {
+            background: #f8f4f0;
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #b68a6b;
+        }
+        .help-step .step-num {
+            font-weight: 700;
+            color: #b68a6b;
+            font-size: 15px;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .help-step p {
+            font-size: 14px;
+            color: #3d3d3d;
+            line-height: 1.5;
+            margin: 2px 0;
+        }
+        .help-step .icon { font-size: 18px; }
+        .help-close {
+            background: #2d3e40;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            transition: 0.2s;
+        }
+        .help-close:hover { background: #1e2e30; }
+
+        /* ===== ESTILOS PARA IMPRESSÃO (PDF) ===== */
+        @media print {
+            body { background: white; padding: 0; }
+            #app { max-width: 100%; }
+            .header-actions, .btn-add, .toolbar, .sticker-actions, .footer-actions, #formContainer, #pinOverlay, .birthday-reminder, .phase-stats, .edit-name-btn, .help-modal {
+                display: none !important;
+            }
+            .sticker-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                height: auto !important;
+                cursor: default !important;
+                perspective: none !important;
+            }
+            .sticker-inner {
+                transform: none !important;
+                height: auto !important;
+                position: relative !important;
+            }
+            .sticker-front, .sticker-back {
+                position: relative !important;
+                backface-visibility: visible !important;
+                transform: none !important;
+                border: 2px solid #ccc;
+                box-shadow: none;
+                padding: 16px !important;
+                height: auto !important;
+                min-height: 280px;
+                overflow: visible !important;
+            }
+            .sticker-back {
+                display: none !important;
+            }
+            .sticker-card.flipped .sticker-inner {
+                transform: none !important;
+            }
+            .sticker-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+                margin-top: 20px;
+            }
+            .header {
+                justify-content: center;
+                border-bottom: 3px solid #b68a6b;
+                padding-bottom: 12px;
+                margin-bottom: 20px;
+            }
+            .header-title .amigoteca {
+                font-size: 32px;
+                background: #2d3e40;
+                color: white;
+                padding: 4px 20px;
+                border-radius: 40px;
+            }
+            .header-title .main-title {
+                font-size: 22px;
+                color: #2d3e40;
+            }
+            .header-title .owner-name {
+                font-size: 18px;
+                color: #555;
+            }
+            .app-footer {
+                border-top: 2px solid #b68a6b;
+                margin-top: 30px;
+                padding-top: 16px;
+                justify-content: center;
+            }
+            .app-footer .credits {
+                text-align: center;
+                font-size: 13px;
+                color: #333;
+            }
+            .app-footer .credits .contact {
+                color: #555;
+            }
+            .sticker-photo {
+                width: 90px;
+                height: 90px;
+                border-width: 3px;
+            }
+            .sticker-name { font-size: 16px; }
+            .sticker-origin, .sticker-tree, .rarity-badge, .phase-badge, .sticker-number {
+                font-size: 11px !important;
+            }
+            .phase-badge { background: #888 !important; color: white !important; }
+            .rarity-badge { background: #ddd !important; color: #222 !important; }
+            .empty-state { display: none !important; }
+            .sticker-card.rarity-Lendária .sticker-front { background: #f4ecf7 !important; border-color: #9b59b6 !important; }
+            .sticker-card.rarity-Épica .sticker-front { background: #ebf5fb !important; border-color: #3498db !important; }
+            .sticker-card.rarity-Rara .sticker-front { background: #e8f8f5 !important; border-color: #1abc9c !important; }
+            .sticker-card.rarity-Especial .sticker-front { background: #fdfdfd !important; border-color: #bdc3c7 !important; }
+        }
 
         /* Responsividade */
         @media (max-width: 500px) {
@@ -590,12 +723,17 @@
             .phase-stats { font-size: 11px; padding: 4px 10px; }
             .birthday-item { font-size: 12px; padding: 2px 10px; }
             .app-footer .credits { font-size: 12px; }
+            .header-title .amigoteca { font-size: 22px; padding: 2px 12px; }
+            .help-content { padding: 20px 16px; }
         }
         @media (min-width: 700px) {
             .sticker-grid { grid-template-columns: repeat(3, 1fr); }
         }
         @media (min-width: 1000px) {
             .sticker-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media print and (max-width: 600px) {
+            .sticker-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
     </style>
 </head>
@@ -604,8 +742,8 @@
 
     <!-- PIN -->
     <div id="pinOverlay">
-        <h2>🔒 Álbum Lendário</h2>
-        <p>Digite o PIN para acessar suas figurinhas</p>
+        <h2>🔒 AMIGOTECA</h2>
+        <p>Digite o PIN para acessar seu álbum</p>
         <input type="password" id="pinInput" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
         <button class="pin-btn" onclick="checkPin()">✨ Desbloquear</button>
         <div id="pinError"></div>
@@ -615,7 +753,8 @@
     <!-- HEADER -->
     <div class="header">
         <div class="header-title">
-            <span class="main-title">📖 Álbum de Figurinhas: <span>Amigos de Minha Vida!</span></span>
+            <span class="amigoteca">AMIGOTECA</span>
+            <span class="main-title">— Álbum de Figurinhas: <span>Amigos de Minha Vida!</span></span>
             <span class="owner-name" id="ownerNameDisplay">— <span id="ownerNameText">...</span></span>
             <button class="edit-name-btn" onclick="editOwnerName()" title="Editar nome">✏️</button>
         </div>
@@ -741,8 +880,10 @@
             <option value="Adulto (25-50)">👨 Adulto</option>
             <option value="Longevidade (50+)">👴 Longevidade</option>
         </select>
-        <button onclick="exportData()">📤</button>
-        <button onclick="importData()">📥</button>
+        <button onclick="exportData()" title="Exportar (Backup)">📤 Backup</button>
+        <button onclick="importData()" title="Importar (Restaurar)">📥 Restaurar</button>
+        <button onclick="generatePDF()" title="Salvar como PDF">📄 PDF</button>
+        <button onclick="openHelp()" title="Ajuda">❓ Ajuda</button>
     </div>
     <div style="margin-bottom:8px; font-size:14px; color:#5a4e44;">
         Total: <span id="friendCount" class="badge-count">0</span>
@@ -751,7 +892,7 @@
 
     <!-- GRADE -->
     <div id="stickerGrid" class="sticker-grid">
-        <div class="empty-state"><span>🖼️</span> Seu álbum está vazio.<br>Clique em <strong>"+ Nova Figurinha"</strong> e comece a guardar seus amigos especiais!</div>
+        <div class="empty-state"><span>🖼️</span> Sua AMIGOTECA está vazia.<br>Clique em <strong>"+ Nova Figurinha"</strong> e comece a guardar seus amigos especiais!</div>
     </div>
 
     <!-- FOOTER -->
@@ -768,11 +909,56 @@
     </div>
 </div>
 
+<!-- MODAL DE AJUDA -->
+<div class="help-modal" id="helpModal">
+    <div class="help-content">
+        <h2><span>📖</span> Como usar sua AMIGOTECA</h2>
+        <p class="sub">Aprenda a exportar e importar seus dados para não perder nenhum amigo!</p>
+
+        <div class="help-step">
+            <span class="step-num">📤 1. Fazer backup (exportar)</span>
+            <p>Clique no botão <strong>"📤 Backup"</strong> (na barra de ferramentas).</p>
+            <p>O navegador vai baixar um arquivo <strong>amigoteca_data.json</strong> – esse é o seu álbum completo!</p>
+            <p>💡 Guarde esse arquivo em um local seguro (Google Drive, e-mail, pendrive, WhatsApp).</p>
+        </div>
+
+        <div class="help-step">
+            <span class="step-num">📥 2. Restaurar (importar) em outro celular ou computador</span>
+            <p>No outro dispositivo, abra a AMIGOTECA e clique em <strong>"📥 Restaurar"</strong>.</p>
+            <p>Selecione o arquivo <strong>.json</strong> que você salvou.</p>
+            <p>Confirme a substituição – todas as suas figurinhas aparecerão instantaneamente!</p>
+            <p>💡 Você pode fazer isso em quantos dispositivos quiser.</p>
+        </div>
+
+        <div class="help-step">
+            <span class="step-num">📄 3. Gerar um catálogo em PDF</span>
+            <p>Clique em <strong>"📄 PDF"</strong> para criar um catálogo bonito com todos os seus amigos.</p>
+            <p>Na janela que abrir, escolha "Salvar como PDF" ou imprimir.</p>
+            <p>💡 Perfeito para presentear ou ter uma versão física.</p>
+        </div>
+
+        <div class="help-step">
+            <span class="step-num">🔐 4. Proteger com PIN</span>
+            <p>Clique no cadeado <strong>🔐</strong> no rodapé para criar um PIN de 4 a 6 dígitos.</p>
+            <p>Assim, ninguém mais pode acessar sua AMIGOTECA sem a senha.</p>
+        </div>
+
+        <div class="help-step" style="border-left-color: #e74c3c;">
+            <span class="step-num">⚠️ Atenção!</span>
+            <p>Os dados ficam <strong>apenas no navegador</strong> de cada dispositivo. Não há servidor.</p>
+            <p>Por isso, <strong>faça backup</strong> sempre que adicionar novos amigos.</p>
+            <p>Se trocar de celular, lembre-se de levar o arquivo <strong>.json</strong> junto.</p>
+        </div>
+
+        <button class="help-close" onclick="closeHelp()">Entendi! Fechar</button>
+    </div>
+</div>
+
 <!-- MODAL PIN SETUP -->
 <div class="modal-bg" id="pinSetupModal">
     <div class="pin-setup-modal">
         <h3>🔐 Configurar PIN</h3>
-        <p style="font-size:13px; color:#666; margin-bottom:12px;">PIN numérico (4 a 6 dígitos) para proteger seu álbum.</p>
+        <p style="font-size:13px; color:#666; margin-bottom:12px;">PIN numérico (4 a 6 dígitos) para proteger sua AMIGOTECA.</p>
         <input type="password" id="newPinInput" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="Novo PIN">
         <input type="password" id="confirmPinInput" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="Confirmar PIN">
         <div style="margin: 8px 0 12px; font-size:13px; color:#b34a4a;" id="pinSetupMsg"></div>
@@ -795,7 +981,7 @@
     function loadOwnerName() {
         let name = localStorage.getItem('ownerName');
         if (!name) {
-            name = prompt('Qual o seu nome? (Dono do álbum)') || 'Um Amigo';
+            name = prompt('Qual o seu nome? (Dono da AMIGOTECA)') || 'Um Amigo';
             localStorage.setItem('ownerName', name);
         }
         document.getElementById('ownerNameText').textContent = name;
@@ -921,7 +1107,7 @@
     // ===== RESET ÁLBUM =====
     function resetAlbum() {
         if (friends.length === 0) {
-            alert('O álbum já está vazio!');
+            alert('A AMIGOTECA já está vazia!');
             return;
         }
         if (confirm('⚠️ Tem certeza que deseja APAGAR TODAS as figurinhas?\nEsta ação não pode ser desfeita.')) {
@@ -930,7 +1116,7 @@
             saveData();
             renderStickers();
             updateBirthdayReminder();
-            alert('🧹 Álbum resetado com sucesso!');
+            alert('🧹 AMIGOTECA resetada com sucesso!');
         }
     }
 
@@ -942,7 +1128,7 @@
         const stored = localStorage.getItem('stickerAlbum');
         if (stored) { try { friends = JSON.parse(stored); } catch(e){ friends = []; } } 
         else {
-            friends = []; // sempre começa vazio
+            friends = [];
             saveData();
         }
         updateStats();
@@ -1146,13 +1332,20 @@
     // ===== EXPORT / IMPORT =====
     function exportData() {
         if (!isUnlocked) return;
-        const blob = new Blob([JSON.stringify(friends, null, 2)], { type: 'application/json' });
+        if (friends.length === 0) {
+            alert('Sua AMIGOTECA está vazia! Adicione alguns amigos antes de exportar.');
+            return;
+        }
+        const dataStr = JSON.stringify(friends, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `album_amigos_${new Date().toISOString().slice(0,10)}.json`;
+        a.download = `amigoteca_data_${new Date().toISOString().slice(0,10)}.json`;
         a.click();
         URL.revokeObjectURL(a.href);
+        alert('✅ Backup exportado com sucesso!\nSalve o arquivo em um local seguro.');
     }
+
     function importData() {
         if (!isUnlocked) return;
         const input = document.createElement('input');
@@ -1166,19 +1359,45 @@
                 try {
                     const imported = JSON.parse(ev.target.result);
                     if (Array.isArray(imported) && imported.length > 0) {
-                        if (confirm(`Substituir ${friends.length} por ${imported.length} figurinhas?`)) {
+                        if (confirm(`Deseja substituir os ${friends.length} amigos atuais por ${imported.length} amigos do backup?`)) {
                             friends = imported;
                             saveData();
                             renderStickers();
-                            alert('Álbum importado com sucesso!');
+                            alert('✅ AMIGOTECA restaurada com sucesso!');
                         }
-                    } else alert('Arquivo inválido.');
-                } catch(err) { alert('Erro ao ler o arquivo.'); }
+                    } else {
+                        alert('Arquivo inválido ou vazio.');
+                    }
+                } catch(err) {
+                    alert('Erro ao ler o arquivo. Certifique-se de que é um backup válido.');
+                }
             };
             reader.readAsText(file);
         };
         input.click();
     }
+
+    // ===== PDF =====
+    function generatePDF() {
+        if (!isUnlocked) return;
+        if (friends.length === 0) {
+            alert('Sua AMIGOTECA está vazia! Adicione alguns amigos antes de gerar o PDF.');
+            return;
+        }
+        window.print();
+    }
+
+    // ===== AJUDA =====
+    function openHelp() {
+        document.getElementById('helpModal').classList.add('active');
+    }
+    function closeHelp() {
+        document.getElementById('helpModal').classList.remove('active');
+    }
+    // Fecha o modal se clicar fora do conteúdo
+    document.getElementById('helpModal').addEventListener('click', function(e) {
+        if (e.target === this) closeHelp();
+    });
 
     // ===== START =====
     loadData();
